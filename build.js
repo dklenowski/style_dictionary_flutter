@@ -1,18 +1,17 @@
+const fs = require('fs')
 const StyleDictionary = require('style-dictionary')
-const baseConfigLight = require('./config-light.json')
-const baseConfigDark = require('./config-dark.json')
-const baseConfigFonts = require('./config-fonts.json')
-
 const Color = require('tinycolor2')
-
 const formats = require('./src/formats');
 
-console.log("------starting build------");
+var lightConfig = './config/light.json'
+var darkConfig ='./config/dark.json'
+var fontsConfig = './config/fonts.json'
+
+console.log("INFO: Starting build..");
 
 function degreesToRadiant(deg) {
     return (deg * Math.PI) / 180.0;
 }
-
 
 StyleDictionary.registerTransform({
     name: 'app/colors',
@@ -25,7 +24,6 @@ StyleDictionary.registerTransform({
         return `Color(0x${str.slice(6)}${str.slice(0, 6)})`;
     },
 })
-
 
 StyleDictionary.registerTransform({
     name: 'app/gradient',
@@ -67,7 +65,6 @@ StyleDictionary.registerTransform({
     },
 });
 
-
 StyleDictionary.registerTransform({
     name: 'app/fonts',
     type: 'value',
@@ -103,9 +100,7 @@ StyleDictionary.registerTransform({
     },
 });
 
-
 for (const key in formats) {
-    
     const formatter = formats[key];
     StyleDictionary.registerFormat({
         name: key,
@@ -113,17 +108,30 @@ for (const key in formats) {
     });
 }
 
-const StyleDictionaryExtendedLight = StyleDictionary.extend(baseConfigLight)
+if (fs.existsSync(lightConfig)) {
+    const baseConfigLight = require(lightConfig)
+    const StyleDictionaryExtendedLight = StyleDictionary.extend(baseConfigLight)
+    StyleDictionaryExtendedLight.buildAllPlatforms()
+}
 
-const StyleDictionaryExtendedDark = StyleDictionary.extend(baseConfigDark)
-const StyleDictionaryExtendedFonts = StyleDictionary.extend(baseConfigFonts)
+if (fs.existsSync(darkConfig)) {
+    const baseConfigDark = require(darkConfig)
+    const StyleDictionaryExtendedDark = StyleDictionary.extend(baseConfigDark)
+    StyleDictionaryExtendedDark.buildAllPlatforms()
+}
 
-StyleDictionaryExtendedLight.buildAllPlatforms()
-StyleDictionaryExtendedDark.buildAllPlatforms()
-StyleDictionaryExtendedFonts.buildAllPlatforms()
+if (fs.existsSync(fontsConfig)) {
+    const baseConfigFonts = require(fontsConfig)
+    const StyleDictionaryExtendedFonts = StyleDictionary.extend(baseConfigFonts)
+    StyleDictionaryExtendedFonts.buildAllPlatforms()
+}
+
+console.log("INFO: Build finished.");
 
 
-console.log("------finished build------");
+
+
+
 
 
 
